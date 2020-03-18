@@ -21,6 +21,7 @@ help:
 	@echo
 	@echo "$(bold)Build:$(reset)"
 	@echo "  $(cyan)build$(reset)                         - build SPIFFE Helper binary (default)"
+	@echo "  $(cyan)image$(reset)                         - build SPIFFE Helper docker image"
 	@echo "  $(cyan)artifact$(reset)                      - build SPIFFE Helper tarball and RPM artifacts"
 	@echo "  $(cyan)tarball$(reset)                       - build SPIFFE Helper tarball artifact"
 	@echo "  $(cyan)rpm$(reset)                           - build SPIFFE Helper RPM artifact"
@@ -144,10 +145,14 @@ lint-code: $(golangci_lint_bin) | go-check
 # Build targets
 ############################################################################
 
-.PHONY: build test clean distclean artifact tarball rpm
+.PHONY: build image test clean distclean artifact tarball rpm
 
 build: | go-check
 	go build -o spiffe-helper ./cmd/spiffe-helper
+
+image: Dockerfile
+	docker build --build-arg goversion=$(go_version) -t spiffe-helper .
+	docker tag spiffe-helper:latest spiffe-helper:latest-local
 
 artifact: tarball rpm
 
